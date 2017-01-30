@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jennifer Brussow" />
+
+
+<title>Example Data Checks with inspectr</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Example Data Checks with <strong>inspectr</strong></h1>
+<h4 class="author"><em>Jennifer Brussow</em></h4>
+
+
+
+<div id="package-format" class="section level2">
+<h2>Package format</h2>
+<p>The <strong>inspectr</strong> package is designed to perform basic data checks without the user needing to understand the intricacies of apply functions.</p>
+<p>The functions can be grouped into two categories: column checks and basic fidelity checks.</p>
+<div id="column-check-functions" class="section level3">
+<h3>Column check functions</h3>
+<p>These are the basic functions used to perform checks. Each function checks one column for data fidelity, and functions exist to check that column against one or two additional columns. A data frame and a column name (or names) go in; a filtered set of records exhibiting issues comes out (either as a dataframe or as an .xlsx document - your choice!)</p>
+</div>
+<div id="basic-fidelity-check-functions" class="section level3">
+<h3>Basic fidelity check functions</h3>
+<p>These functions are designed to be used with the column check functions. They perform basic checks on the data, like ensuring that all data in a column are of the same type or ensuring that all values in column 1 are less than their corresponding values in column 2.</p>
+</div>
+</div>
+<div id="checking-an-example-dataset" class="section level2">
+<h2>Checking an example dataset</h2>
+<p>To illustrate how to use these functions, let’s apply some basic checks to a sample dataset:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ID_var</th>
+<th align="left">FName</th>
+<th align="left">Var1</th>
+<th align="left">Var2</th>
+<th align="left">Perf_Lvl</th>
+<th align="left">dates</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">475410871</td>
+<td align="left">David</td>
+<td align="left">23</td>
+<td align="left">24</td>
+<td align="left">Basic</td>
+<td align="left">11/3/1985</td>
+</tr>
+<tr class="even">
+<td align="left">7702757443</td>
+<td align="left">Dorian</td>
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">Basic</td>
+<td align="left">10/4/1984</td>
+</tr>
+<tr class="odd">
+<td align="left">KS - Kansas</td>
+<td align="left">Silas</td>
+<td align="left">51</td>
+<td align="left">52</td>
+<td align="left">Intermediate</td>
+<td align="left">9/3/1981</td>
+</tr>
+<tr class="even">
+<td align="left">9674734384ï¿½</td>
+<td align="left">Jacob</td>
+<td align="left">97</td>
+<td align="left">98</td>
+<td align="left">Advanced</td>
+<td align="left">6/24/1979</td>
+</tr>
+<tr class="odd">
+<td align="left">7522008646</td>
+<td align="left">Gabriel</td>
+<td align="left">85</td>
+<td align="left">86</td>
+<td align="left">Advanced</td>
+<td align="left">11/5/1983</td>
+</tr>
+<tr class="even">
+<td align="left">3062460685</td>
+<td align="left">CLAYTON</td>
+<td align="left">21</td>
+<td align="left">22</td>
+<td align="left">Basic</td>
+<td align="left">3/25/1987</td>
+</tr>
+<tr class="odd">
+<td align="left">3462891407</td>
+<td align="left">Errell</td>
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">Basic</td>
+<td align="left">7/7/1983</td>
+</tr>
+<tr class="even">
+<td align="left">4327020559</td>
+<td align="left">NA</td>
+<td align="left">11</td>
+<td align="left">12</td>
+<td align="left">Basic</td>
+<td align="left">9/14/1988</td>
+</tr>
+<tr class="odd">
+<td align="left">6042592424</td>
+<td align="left"></td>
+<td align="left">3</td>
+<td align="left">4</td>
+<td align="left">Basic</td>
+<td align="left">6/2/1982</td>
+</tr>
+<tr class="even">
+<td align="left">4087289192</td>
+<td align="left">Dylan</td>
+<td align="left">14</td>
+<td align="left">14</td>
+<td align="left">Basic</td>
+<td align="left">5/15/1986</td>
+</tr>
+<tr class="odd">
+<td align="left">4322037348</td>
+<td align="left">Randy</td>
+<td align="left">15</td>
+<td align="left">16</td>
+<td align="left">Basic</td>
+<td align="left">10/4/1982</td>
+</tr>
+<tr class="even">
+<td align="left">22831223</td>
+<td align="left">Caden</td>
+<td align="left">35</td>
+<td align="left">36</td>
+<td align="left">Basic</td>
+<td align="left">6/11/1989</td>
+</tr>
+<tr class="odd">
+<td align="left">3577493348</td>
+<td align="left">Aspen</td>
+<td align="left">56</td>
+<td align="left">28</td>
+<td align="left">Basic</td>
+<td align="left">5/14/1985</td>
+</tr>
+<tr class="even">
+<td align="left">3496003836</td>
+<td align="left">Tyreek</td>
+<td align="left">29</td>
+<td align="left">30</td>
+<td align="left">Basic</td>
+<td align="left">4/11/1982</td>
+</tr>
+<tr class="odd">
+<td align="left">4589950456</td>
+<td align="left">Aerielle</td>
+<td align="left">31</td>
+<td align="left">32</td>
+<td align="left">Basic</td>
+<td align="left">10/9/1981</td>
+</tr>
+<tr class="even">
+<td align="left">789524583</td>
+<td align="left">Brandon</td>
+<td align="left">45</td>
+<td align="left">4</td>
+<td align="left">Intermediate</td>
+<td align="left">2/1/1984</td>
+</tr>
+<tr class="odd">
+<td align="left">7824406944</td>
+<td align="left">Paul</td>
+<td align="left">19</td>
+<td align="left">20</td>
+<td align="left">NA</td>
+<td align="left">bad_day</td>
+</tr>
+<tr class="even">
+<td align="left">9770520729</td>
+<td align="left">Khalyd</td>
+<td align="left">17</td>
+<td align="left">17</td>
+<td align="left">NA</td>
+<td align="left">10/6/1988</td>
+</tr>
+<tr class="odd">
+<td align="left">39965152</td>
+<td align="left">Marlayni</td>
+<td align="left">63</td>
+<td align="left">64</td>
+<td align="left">BAsic</td>
+<td align="left">8/9/1982</td>
+</tr>
+<tr class="even">
+<td align="left">2004790709</td>
+<td align="left">Anthony</td>
+<td align="left">65</td>
+<td align="left">66</td>
+<td align="left">Advanced</td>
+<td align="left">12/21/1983</td>
+</tr>
+</tbody>
+</table>
+<div id="single-column-checks" class="section level3">
+<h3>Single-column checks</h3>
+<p>The <code>col_check</code> function is designed to check a single column of data for fidelity to a given check. Several of the basic functions are appropriate for the single column check: <code>numeric_check</code>, <code>character_check</code>, <code>character_blanks_check</code>, <code>date_check</code>, and <code>val_check</code>.</p>
+<div id="numeric-checks" class="section level5">
+<h5>Numeric checks</h5>
+<p>The <code>numeric_check</code> function checks to ensure all of the values in the column can be coerced into numeric values by <code>as.numeric</code>. For example, in the example dataset, the goal is to ensure that all of the IDs in the ID_var column are numeric.</p>
+<p>When checking the example dataset with this function, the results show that there are two records that have non-numeric characters in their ID variables. By setting <code>output = FALSE</code> in the arguments, the function returns a dataframe containing only the records with errors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">col_check</span>(<span class="st">&quot;ID_var&quot;</span>, dataset, numeric_check, <span class="dt">output =</span> <span class="ot">FALSE</span>)
+<span class="co">#&gt;          ID_var FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 3   KS - Kansas Silas   51   52 Intermediate  9/3/1981</span>
+<span class="co">#&gt; 4 9674734384ï¿½ Jacob   97   98     Advanced 6/24/1979</span></code></pre></div>
+</div>
+<div id="character-checks" class="section level5">
+<h5>Character checks</h5>
+<p>These <code>character_check</code> and <code>character_blanks_check</code> functions ensure that all of the values in the column can be coerced into character strings by <code>as.character</code>. While <code>character_check</code> does not tolerate blank values, <code>character_blanks_check</code> allows blanks as acceptable values for the purposes of the check. This difference is illustrated by the different results each check yields from the sample dataset:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">col_check</span>(<span class="st">&quot;FName&quot;</span>, dataset, character_check)
+<span class="co">#&gt;       ID_var FName Var1 Var2 Perf_Lvl     dates</span>
+<span class="co">#&gt; 8 4327020559  &lt;NA&gt;   11   12    Basic 9/14/1988</span>
+
+<span class="kw">col_check</span>(<span class="st">&quot;FName&quot;</span>, dataset, character_blanks_check)
+<span class="co">#&gt;       ID_var FName Var1 Var2 Perf_Lvl     dates</span>
+<span class="co">#&gt; 8 4327020559  &lt;NA&gt;   11   12    Basic 9/14/1988</span>
+<span class="co">#&gt; 9 6042592424          3    4    Basic  6/2/1982</span></code></pre></div>
+<p>As you can see, neither of these checks tolerates NA values.</p>
+</div>
+<div id="value-check" class="section level5">
+<h5>Value check</h5>
+<p>The <code>value_check</code> function allows the user to input their own values to set the parameters of the check. The user supplies a vector of accepted values to the <code>values</code> argument, and the check ensures that all values in the column are within that set of accepted values. Blank values and NA values are not tolerated by default, though they can be included in the vector of accepted values.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##Need to resolve three dots issues for date_check
+<span class="kw">col_check</span>(<span class="st">&quot;Perf_Lvl&quot;</span>, dataset, val_check, <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;Basic&quot;</span>, <span class="st">&quot;Intermediate&quot;</span>, <span class="st">&quot;Advanced&quot;</span>))
+<span class="co">#&gt;        ID_var    FName Var1 Var2 Perf_Lvl     dates</span>
+<span class="co">#&gt; 17 7824406944     Paul   19   20     &lt;NA&gt;   bad_day</span>
+<span class="co">#&gt; 18 9770520729   Khalyd   17   17     &lt;NA&gt; 10/6/1988</span>
+<span class="co">#&gt; 19   39965152 Marlayni   63   64    BAsic  8/9/1982</span>
+
+<span class="kw">col_check</span>(<span class="st">&quot;Var1&quot;</span>, dataset, val_check, <span class="dt">values =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">25</span>))
+<span class="co">#&gt;           ID_var    FName Var1 Var2     Perf_Lvl      dates</span>
+<span class="co">#&gt; 3    KS - Kansas    Silas   51   52 Intermediate   9/3/1981</span>
+<span class="co">#&gt; 4  9674734384ï¿½    Jacob   97   98     Advanced  6/24/1979</span>
+<span class="co">#&gt; 5     7522008646  Gabriel   85   86     Advanced  11/5/1983</span>
+<span class="co">#&gt; 12      22831223    Caden   35   36        Basic  6/11/1989</span>
+<span class="co">#&gt; 13    3577493348    Aspen   56   28        Basic  5/14/1985</span>
+<span class="co">#&gt; 14    3496003836   Tyreek   29   30        Basic  4/11/1982</span>
+<span class="co">#&gt; 15    4589950456 Aerielle   31   32        Basic  10/9/1981</span>
+<span class="co">#&gt; 16     789524583  Brandon   45    4 Intermediate   2/1/1984</span>
+<span class="co">#&gt; 19      39965152 Marlayni   63   64        BAsic   8/9/1982</span>
+<span class="co">#&gt; 20    2004790709  Anthony   65   66     Advanced 12/21/1983</span></code></pre></div>
+</div>
+<div id="date-check" class="section level5">
+<h5>Date check</h5>
+<p>The <code>date_check</code> function allows the user to input a beginning and end date to set the parameters of the check. The check ensures that all values in the column are equal to or between the specified beginning and end dates and returns all values that do not fall within the given range.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">col_check</span>(<span class="st">&quot;dates&quot;</span>, dataset, date_check, <span class="dt">begin =</span> <span class="st">&quot;06/02/1982&quot;</span>, <span class="dt">end =</span> <span class="st">&quot;11/11/1986&quot;</span>)
+<span class="co">#&gt;           ID_var    FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 3    KS - Kansas    Silas   51   52 Intermediate  9/3/1981</span>
+<span class="co">#&gt; 4  9674734384ï¿½    Jacob   97   98     Advanced 6/24/1979</span>
+<span class="co">#&gt; 6     3062460685  CLAYTON   21   22        Basic 3/25/1987</span>
+<span class="co">#&gt; 8     4327020559     &lt;NA&gt;   11   12        Basic 9/14/1988</span>
+<span class="co">#&gt; 12      22831223    Caden   35   36        Basic 6/11/1989</span>
+<span class="co">#&gt; 14    3496003836   Tyreek   29   30        Basic 4/11/1982</span>
+<span class="co">#&gt; 15    4589950456 Aerielle   31   32        Basic 10/9/1981</span>
+<span class="co">#&gt; 17    7824406944     Paul   19   20         &lt;NA&gt;   bad_day</span>
+<span class="co">#&gt; 18    9770520729   Khalyd   17   17         &lt;NA&gt; 10/6/1988</span></code></pre></div>
+</div>
+</div>
+<div id="two-column-checks" class="section level3">
+<h3>Two-column checks</h3>
+<p>The <code>two_col_check</code> function is designed to check one column of data against values in another column. Several of the basic functions are appropriate for the two column check: <code>less_than</code>, <code>less_than_equalto</code>, <code>greater_than</code>, and <code>greater_than_equalto</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">two_col_check</span>(<span class="st">&quot;Var1&quot;</span>, <span class="st">&quot;Var2&quot;</span>, dataset, less_than)
+<span class="co">#&gt;        ID_var   FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 10 4087289192   Dylan   14   14        Basic 5/15/1986</span>
+<span class="co">#&gt; 13 3577493348   Aspen   56   28        Basic 5/14/1985</span>
+<span class="co">#&gt; 16  789524583 Brandon   45    4 Intermediate  2/1/1984</span>
+<span class="co">#&gt; 18 9770520729  Khalyd   17   17         &lt;NA&gt; 10/6/1988</span>
+
+<span class="kw">two_col_check</span>(<span class="st">&quot;Var1&quot;</span>, <span class="st">&quot;Var2&quot;</span>, dataset, less_than_equalto)
+<span class="co">#&gt;        ID_var   FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 13 3577493348   Aspen   56   28        Basic 5/14/1985</span>
+<span class="co">#&gt; 16  789524583 Brandon   45    4 Intermediate  2/1/1984</span></code></pre></div>
+<p>The <code>greater_than</code> and <code>greater_than_equalto</code> functions work similarly. Notice that for these checks,the order of the input columns is reversed; <em>Var2</em> is the column being checked for fidelity, and <em>Var1</em> is the reference column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">two_col_check</span>(<span class="st">&quot;Var2&quot;</span>, <span class="st">&quot;Var1&quot;</span>, dataset, greater_than)
+<span class="co">#&gt;        ID_var   FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 10 4087289192   Dylan   14   14        Basic 5/15/1986</span>
+<span class="co">#&gt; 13 3577493348   Aspen   56   28        Basic 5/14/1985</span>
+<span class="co">#&gt; 16  789524583 Brandon   45    4 Intermediate  2/1/1984</span>
+<span class="co">#&gt; 18 9770520729  Khalyd   17   17         &lt;NA&gt; 10/6/1988</span>
+
+<span class="kw">two_col_check</span>(<span class="st">&quot;Var2&quot;</span>, <span class="st">&quot;Var1&quot;</span>, dataset, greater_than_equalto)
+<span class="co">#&gt;        ID_var   FName Var1 Var2     Perf_Lvl     dates</span>
+<span class="co">#&gt; 13 3577493348   Aspen   56   28        Basic 5/14/1985</span>
+<span class="co">#&gt; 16  789524583 Brandon   45    4 Intermediate  2/1/1984</span></code></pre></div>
+</div>
+<div id="three-column-checks" class="section level3">
+<h3>Three-column checks</h3>
+<p>As of version 1.0.0, <strong>inspectr</strong> does not include any basic fidelity check functions that are designed to work with <code>three_col_check</code>. However, you are encouraged to write your own and plug them in! The example below shows a function written to check the <em>Perf_Lvl</em> column against <em>Var1</em> and <em>Var2</em> as reference columns. In order to pass the check, the value of <em>Perf_Lvl</em> has to be either “Basic”, “Intermediate”, or “Advanced”; OR if <em>Perf_Lvl</em> is NA, then <em>Var2</em> must be even and <em>Var1</em> must be odd.</p>
+<p>This is sort of a silly check, but it illustrates the way a user-defined function can be used with <code>three_col_check</code>. Of course, you can also use user-defined functions with <code>col_check</code> and <code>two_col_check</code>, as well.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">three_col_check</span>(<span class="dt">colname1 =</span> <span class="st">&quot;Perf_Lvl&quot;</span>, <span class="dt">colname2 =</span> <span class="st">&quot;Var1&quot;</span>, <span class="dt">colname3 =</span> <span class="st">&quot;Var2&quot;</span>,
+                <span class="dt">data =</span> dataset, <span class="dt">fun =</span> <span class="cf">function</span>(col1, col2, col3){
+                  col1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Basic&quot;</span>, <span class="st">&quot;Intermediate&quot;</span>, <span class="st">&quot;Advanced&quot;</span>) <span class="op">|</span>
+<span class="st">                    </span>(<span class="kw">is.na</span>(col1) <span class="op">&amp;</span><span class="st"> </span>(col3 <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="dv">0</span>) <span class="op">&amp;</span><span class="st"> </span>(col2 <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="dv">1</span> ))
+})
+<span class="co">#&gt;        ID_var    FName Var1 Var2 Perf_Lvl     dates</span>
+<span class="co">#&gt; 18 9770520729   Khalyd   17   17     &lt;NA&gt; 10/6/1988</span>
+<span class="co">#&gt; 19   39965152 Marlayni   63   64    BAsic  8/9/1982</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
